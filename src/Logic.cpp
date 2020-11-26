@@ -8,6 +8,8 @@
 #include "AbstractPort.h"
 #include <ctype.h>
 #include <cassert>
+#include <stdio.h>
+#include <iostream>
 
 /* array used to generate crc16 */
 unsigned short crc16_tab[256] = {
@@ -111,9 +113,14 @@ Logic::read_status (AbstractPort * port, const char *port_name, char id, char mb
   crc16 = generate_crc16 (packet);
   packet[PACKETSIZE - 2] = crc16 / 256;
   packet[PACKETSIZE - 1] = crc16 % 256;
-
+ // std::cout << std::hex << packet[0] << std::endl;
+  //printf("%02x",packet[0]);
+  //std::cout << std::endl;
   if (port->send_packet (packet) < PACKETSIZE)
     {
+      printf("packet size error1?");
+      std::cout << std::endl;
+
       port->close_port ();
       return SEND_ERROR;
     }
@@ -215,6 +222,8 @@ Logic::fill_data_packet (unsigned char packet[PACKETSIZE],
   packet[5] = page_index % 256;
   /* copy data to packet */
   memcpy (&packet[6], data, FRAMESIZE);
+  printf("data: %02x",packet[6]);
+  std::cout << std::endl;
 
   /* generate and set crc */
   crc16 = generate_crc16 (packet);
@@ -300,6 +309,7 @@ Logic::send_start_packet (AbstractPort * port, config_t cfg)
   crc16 = Logic::generate_crc16 (packet);
   packet[PACKETSIZE - 2] = crc16 / 256;
   packet[PACKETSIZE - 1] = crc16 % 256;
+
   if (port->send_packet (packet) < PACKETSIZE)
     return FALSE;
   else

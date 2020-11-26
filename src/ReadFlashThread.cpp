@@ -7,7 +7,6 @@
 #include "Logic.h"
 #include "const.h"
 
-
 void
 ReadFlashThread::run ()
 {

@@ -47,7 +47,7 @@ parse_params (int /*argc*/, char *argv[])
  */
       if ((*argv)[0] == '-' && isdigit ((*argv)[1]) && (*argv)[1] >= '0'
 	  && (*argv)[1] <= '7')
-	{
+	{   
 	  switch ((*argv)[1] - '0')
 	    {
 	    case 0:

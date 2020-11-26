@@ -6,6 +6,12 @@
 #include "Settings.h"
 #include "Logic.h"
 #include "const.h"
+#include <iostream>
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
 
 
 void
@@ -34,12 +40,17 @@ WriteFlashThread::run ()
     {				/* send start and wait for ACK */
       if (Logic::send_start_packet (port, cfg) == FALSE)
 	{
-	  port->close_port ();
+      printf("Port blocked?");
+      std::cout << std::endl;
+
+      port->close_port ();
 	  fclose (file);
 	  emit error (SEND_ERROR);
 	  return;
 	}
       character = port->receive_char ();
+      printf("receive: %02x",character);
+      std::cout << std::endl;
       if (character == END || character == TIMEOUT)
 	{
 	  port->close_port ();
@@ -48,9 +59,9 @@ WriteFlashThread::run ()
 	  return;
 	}
     }
-  while (character != ACK && ++retries < 10);	/* repeat 10 times */
+  while (character != ACK && ++retries < 10000);	/* repeat 10 times */
 
-  if (retries == 10)
+  if (retries == 10000)
     {				/* wait time passed */
       port->close_port ();
       fclose (file);
@@ -73,10 +84,14 @@ WriteFlashThread::run ()
 
       do
 	{			/* send packet and wait for ACK */
+      printf("page:packet %02x",page_number);printf(": %02x",packet_number);
+      std::cout << std::endl;
 
 	  //end of thread!!!!
 	  if (end)
-	    {
+        {
+          printf("end of thread");
+          std::cout << std::endl;
 	      Logic::fill_data_packet (packet, &data[packet_number * 64],
 				       LAST_DATA, packet_number, page_number);
 	      zamykanie = TRUE;
@@ -85,28 +100,43 @@ WriteFlashThread::run ()
 
 	  if (port->send_packet (packet) < PACKETSIZE)
 	    {
-	      port->close_port ();
-	      fclose (file);
-	      emit error (SEND_ERROR);
-	      return;
+          printf("packet size error2?");
+          std::cout << std::endl;
+          //--packet_number;
+//          port->close_port ();
+//	      fclose (file);
+//	      emit error (SEND_ERROR);
+//	      return;
+
 	    }
 
 	  character = port->receive_char ();
-	  if (character == END || character == TIMEOUT)
+
+      printf("receive: %02x",character);
+      printf("\nretries: %i",retries);
+
+      std::cout << std::endl;
+      if (character == END) // || character == TIMEOUT)
 	    {
-	      port->close_port ();
-	      fclose (file);
-	      emit error (character);
-	      return;
+          printf("end received, wait a 10s then restart");
+          std::cout << std::endl;
+//          port->close_port ();
+//	      fclose (file);
+//	      emit error (character);
+//	      return;
+          sleep(10);
 	    }
 	  if (character == ACK)
 	    {			/* ACK of packet recive */
 	      if (zamykanie)
 		{
-		  port->close_port ();
+          printf("end received, sucess?");
+          std::cout << std::endl;
+
+          port->close_port ();
 		  fclose (file);
 		  emit error (END);
-		  return;
+          return;
 		}
 
 	      if (++packet_number == 256)	/* last packet on page */
@@ -126,7 +156,7 @@ WriteFlashThread::run ()
 				 page_count * 256 - 1);
 	    }
 	  /* NAK - bad packet */
-	  else if (++retries == 10)
+      else if (++retries == 10000)
 	    {
 	      port->close_port ();
 	      fclose (file);

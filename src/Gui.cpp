@@ -10,7 +10,8 @@
 #include "Settings.h"
 #include "Logic.h"
 #include "About.h"
-
+//#include <stdio.h>
+#include <iostream>
 
 
 #ifdef Q_WS_X11
@@ -33,6 +34,7 @@ int
 Gui::Gui (QWidget * parent):QWidget (parent)
 {
   QThread::currentThread ()->setPriority (QThread::NormalPriority);
+  QString tmp;
   path = ".";			//current startup dir
   this->setWindowIcon (QIcon (QPixmap (icon)));
   this->setWindowTitle (tr ("GB Cart Flasher version ") + VER);
@@ -130,6 +132,20 @@ Gui::Gui (QWidget * parent):QWidget (parent)
 	   SLOT (setRamButtons (void)));
   setProgress (0, 1);
   console->print (tr ("GB Cart Flasher version ") + VER + tr (" started."));
+
+  //printf("Debug mode\n");
+  //printf("Debug mode\n");
+  std::cout << "Debug mode" << std::endl;
+  console->print (tr ("Debug mode"));
+  tmp = tmp.sprintf (" 0x%02x", Settings::dap);
+  console->print (tr ("data polling") + tmp);
+  tmp = tmp.sprintf (" 0x%02x", Settings::algorythm);
+  console->print (tr ("write algorythm") + tmp);
+  tmp = tmp.sprintf (" 0x%02x", Settings::speed);
+  console->print (tr ("USB speed") + tmp);
+  tmp = tmp.sprintf (" 0x%02x", Settings::priority);
+  console->print (tr ("thread priority") + tmp);
+
 #ifdef Q_WS_WIN
 /* device detection is avilable only on Windows */
   if (Settings::commanual == FALSE)

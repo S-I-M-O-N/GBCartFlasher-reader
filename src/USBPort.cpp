@@ -31,7 +31,8 @@ USBPort::open_port (QString /*port_name*/)
 /* choose speed */
   if (Settings::speed == STANDARD)
     {
-      if (ftdi_set_baudrate (&ftdic, 185000) < 0)
+      //if (ftdi_set_baudrate (&ftdic, 185000) < 0)
+      if (ftdi_set_baudrate (&ftdic, 93750) < 0)
 	return FALSE;
     }
   else if (Settings::speed == LOW)

@@ -17,11 +17,17 @@ alg_t
   Settings::algorythm = ALG16;
 dap_t
   Settings::dap = TOGGLE;
+   // Settings::dap = DEFAULT;
+  // Settings::dap = LONGER;
+  //Settings::dap = DATAPOLL;
 bool
   Settings::showbbl = FALSE;
 speed_type
   Settings::speed = STANDARD;
-QThread::Priority Settings::priority = QThread::NormalPriority;
+  //Settings::speed = LOW;
+  //Settings::speed = HIGH;
+//QThread::Priority Settings::priority = QThread::NormalPriority;
+  QThread::Priority Settings::priority = QThread::HighestPriority;
 
 Settings::Settings (QWidget * parent):QGroupBox (tr ("Settings"), parent)
 {
